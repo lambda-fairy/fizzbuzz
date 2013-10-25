@@ -1,5 +1,7 @@
 -- | Race conditions? What race conditions?
 
+module Sleep where
+
 import Control.Concurrent
 import Control.Monad
 
