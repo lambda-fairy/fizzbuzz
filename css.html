@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>FizzBuzz in CSS</title>
+    <style>
+      body {
+        font: 12px Verdana;
+        counter-reset: i;
+      }
+      h1 {
+        font-size: 200%;
+        margin: 0.5em;
+      }
+      p {
+        display: inline-block;
+        margin: 1em;
+        width: 5em;
+      }
+      p::after {
+        counter-increment: i;
+        content: counter(i);
+      }
+      p:nth-of-type(3n)::before {
+        content: 'Fizz';
+        color: #f06;
+      }
+      p:nth-of-type(3n)::after {
+        content: '';
+      }
+      p:nth-of-type(5n)::after {
+        content: 'Buzz';
+        color: #60f;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>FizzBuzz in CSS</h1>
+    <script>
+      for (var i = 1; i <= 100; ++i) {
+        var p = document.createElement('p')
+        document.body.appendChild(p)
+      }
+    </script>
+  </body>
+</html>
