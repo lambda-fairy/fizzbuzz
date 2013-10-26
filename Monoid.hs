@@ -7,9 +7,7 @@ import Control.Monad (guard)
 import Data.Maybe (fromMaybe)
 import Data.Monoid (mconcat)
 
-import Util
-
-main = run fizzify
+main = mapM_ (putStrLn . fizzify) [1..100]
 
 fizzify = fromMaybe <$> show <*> mconcat
                                     [ check 3 "Fizz"

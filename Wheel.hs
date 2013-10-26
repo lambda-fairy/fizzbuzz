@@ -5,11 +5,7 @@
 
 module Wheel where
 
-import Control.Applicative ((<$>), (<*>))
-
-import Util
-
-main = runList $ zipWith ($) wheel
+main = mapM_ putStrLn $ zipWith ($) wheel [1..100]
 
 wheel = cycle [i, i, f, i, b, f, i, i, f, b, i, f, i, i, (\x -> f x ++ b x)]
   where
