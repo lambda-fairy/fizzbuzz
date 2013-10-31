@@ -1,25 +1,27 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fcontext-stack=1000 #-}
 
--- | Type-level computation using Type Families.
+-- | Type-level (compile-time) computation using type families.
 --
--- Warning: This takes almost 15 minutes to compile on my laptop.  Be warned.
-
+-- See also: the functional dependencies version at <http://blog.omega-prime.co.uk/?p=28>.
+--
+-- This takes almost 15 minutes to /compile/ on my laptop.  Be warned.
+--
 module TypeFamilies where
-
-class ReifyN a where
-    reifyN :: Proxy a -> Integer
 
 data Proxy a = Proxy
 
 data Z
 data S a
 
-instance ReifyN Z where
-    reifyN _ = 0
+class Reify a where
+    reify :: Proxy a -> Integer
 
-instance forall a. ReifyN a => ReifyN (S a) where
-    reifyN _ = 1 + reifyN (Proxy :: Proxy a)
+instance Reify Z where
+    reify _ = 0
+
+instance forall a. Reify a => Reify (S a) where
+    reify _ = 1 + reify (Proxy :: Proxy a)
 
 type N0 = Z
 type N1 = S N0
@@ -27,6 +29,10 @@ type N2 = S N1
 type N3 = S N2
 type N4 = S N3
 type N5 = S N4
+type N6 = S N5
+type N7 = S N6
+type N8 = S N7
+type N9 = S N8
 
 type N10 = Add N5 N5
 type N20 = Add N10 N10
@@ -71,28 +77,29 @@ data Fizz
 data Buzz
 data FizzBuzz
 
-type Fizzify a = Blah (Divides a N3) (Divides a N5) a
+type Fizzify a = Fizzify' (Divides a N3) (Divides a N5) a
+type family Fizzify' n3 n5 a :: *
+type instance Fizzify' True True a = FizzBuzz
+type instance Fizzify' True False a = Fizz
+type instance Fizzify' False True a = Buzz
+type instance Fizzify' False False a = a
 
-type family Blah n3 n5 a :: *
-type instance Blah True True a = FizzBuzz
-type instance Blah True False a = Fizz
-type instance Blah False True a = Buzz
-type instance Blah False False a = a
+type FBList lim = FBList' lim N1
+type family FBList' down up :: *
+type instance FBList' Z up = ()
+type instance FBList' (S down) up = Fizzify up ::: FBList' down (S up)
 
 class Display a where
     display :: Proxy a -> String
-
-realize :: Display a => Proxy a -> IO ()
-realize = putStr . display
 
 instance Display () where
     display _ = ""
 
 instance Display Z where
-    display p = show (reifyN p)
+    display p = show (reify p)
 
-instance ReifyN (S a) => Display (S a) where
-    display p = show (reifyN p)
+instance Reify (S a) => Display (S a) where
+    display p = show (reify p)
 
 instance forall a b. (Display a, Display b) => Display (a ::: b) where
     display _ = display (Proxy :: Proxy a) ++ "\n" ++ display (Proxy :: Proxy b)
@@ -106,10 +113,5 @@ instance Display Buzz where
 instance Display FizzBuzz where
     display _ = "FizzBuzz"
 
-type FBList lim = FBList' lim N1
-type family FBList' down up :: *
-type instance FBList' Z up = ()
-type instance FBList' (S down) up = Fizzify up ::: FBList' down (S up)
-
 main :: IO ()
-main = realize (Proxy :: Proxy (FBList N100))
+main = putStr $ display (Proxy :: Proxy (FBList N100))
