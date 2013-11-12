@@ -1,0 +1,3 @@
+#!/bin/sh
+tail -n+4 "$0"|xz -d -F raw --lzma2=dict=8k
+exit
