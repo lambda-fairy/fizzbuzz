@@ -8,7 +8,7 @@ stub extracts the data and pipes it to stdout.
 Running
 -------
 
-You will need a Unix system with `xz` installed.
+You will need a Unix system with `xz` and `make` installed.
 
-    $ ./build
+    $ make
     $ ./fizzbuzz

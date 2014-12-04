@@ -1,5 +1,0 @@
-#!/bin/sh -e
-output="fizzbuzz"
-cp "stub" "$output"
-xz --compress --stdout --format=raw --lzma2=dict=8k "data" >> "$output"
-chmod +x "$output"
